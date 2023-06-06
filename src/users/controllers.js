@@ -37,6 +37,7 @@ async function login(req, res) { // allows users to login to their accounts and 
   
       res.status(200).send({ 
         message: "Login successful",
+        user: req.body.username,
         token: token
       });
     } catch (error) {
