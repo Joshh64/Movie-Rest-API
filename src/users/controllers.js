@@ -21,15 +21,16 @@ async function registerUser(req, res) { // lets users create accounts
 
 async function login(req, res) { // allows users to login to their accounts and also generates what is called a token when they do
     try {
-      const user = await User.findOne({ 
-        username: req.body.username
-    });
-  
-      if (!user) {
-        return res.status(404).send({ 
-          message: "Username or password incorrect" 
-        });
-      }
+      if (req.authUser) {
+        res.status(200).send({
+          message: "Successfully logged in",
+          user: {
+            user: req.authUser.username,
+            email: req.authUser.email
+          }
+        })
+        return
+      } // persistant login
 
       const token = await jwt.sign({
         id: req.userInfo._id

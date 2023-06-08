@@ -64,17 +64,24 @@ async function validateEmail (req, res, next) { // checks if there is an @ sign 
 
 async function tokenCheck (req, res, next) { // allows for the user to automatically login if they have already done so before
     try {
-        const token = req.header("Authorization")
+        if (!req.header("Authorization")) {
+            throw new Error ("Unauthorised")
+        }
 
-        const decodedToken = await jwt.verify(token, process.env.SECRET_KEY)
+        const token = req.header("Authorization")
+        console.log(token)
+
+        const decodedToken = jwt.verify(token, process.env.SUPER_SECRET_KEY)
 
         const user = await User.findById(decodedToken.id)
         
-        if (user) {
-            next()
-        } else {
-            throw new Error ("User is not authorised")
+        if (!user) {
+            throw new Error ("User not authorised")
         }
+        
+        req.authUser = user
+        
+        next()
     } catch (error) {
         console.log(error)
         res.status(500).send({
